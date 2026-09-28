@@ -24,8 +24,39 @@ class _LoginScreenState extends State<LoginScreen> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
-    AuthService.instance.login(username, password);
-    Navigator.of(context).pushReplacementNamed('/main');
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('กรุณากรอกอีเมล/รหัสนักศึกษาและรหัสผ่าน'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (AuthService.instance.registeredUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('ยังไม่มีบัญชีในระบบ กรุณาสมัครสมาชิกก่อนเข้าสู่ระบบ'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      _navigateToRegister();
+      return;
+    }
+
+    final success = AuthService.instance.login(username, password);
+
+    if (success) {
+      Navigator.of(context).pushReplacementNamed('/main');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('อีเมล/รหัสนักศึกษา หรือ รหัสผ่านไม่ถูกต้อง'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _navigateToRegister() async {
@@ -230,7 +261,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   height: 52,
                   child: OutlinedButton(
-                    onPressed: _handleLogin,
+                    onPressed: () {
+                      if (AuthService.instance.registeredUser == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('ยังไม่มีบัญชีในระบบ กรุณาสมัครสมาชิกก่อนเข้าสู่ระบบ'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        _navigateToRegister();
+                      } else {
+                        AuthService.instance.login(
+                          AuthService.instance.registeredUser!.emailOrStudentId,
+                          AuthService.instance.registeredUser!.password,
+                        );
+                        Navigator.of(context).pushReplacementNamed('/main');
+                      }
+                    },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFCBD5E1)),
                       shape: RoundedRectangleBorder(
