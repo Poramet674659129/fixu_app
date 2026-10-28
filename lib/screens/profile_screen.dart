@@ -144,19 +144,19 @@ class ProfileScreen extends StatelessWidget {
                       _buildProfileOption(
                         icon: Icons.lock_outline,
                         title: 'เปลี่ยนรหัสผ่าน',
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).pushNamed('/settings'),
                       ),
                       const Divider(height: 1, color: Color(0xFFF1F5F9)),
                       _buildProfileOption(
                         icon: Icons.notifications_none,
                         title: 'การแจ้งเตือน',
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).pushNamed('/settings'),
                       ),
                       const Divider(height: 1, color: Color(0xFFF1F5F9)),
                       _buildProfileOption(
                         icon: Icons.help_outline,
                         title: 'ศูนย์ช่วยเหลือและคำถามที่พบบ่อย',
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).pushNamed('/settings'),
                       ),
                     ],
                   ),
@@ -171,7 +171,7 @@ class ProfileScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       AuthService.instance.logout();
-                      Navigator.of(context).pushReplacementNamed('/login');
+                      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                     },
                     icon: const Icon(Icons.logout, size: 20),
                     label: const Text(

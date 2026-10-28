@@ -70,13 +70,20 @@ class HomeScreen extends StatelessWidget {
                           },
                         ),
                         // Profile Avatar
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          child: const Icon(
-                            Icons.person,
-                            size: 30,
-                            color: Colors.white,
+                        GestureDetector(
+                          onTap: () {
+                            if (onSelectTab != null) {
+                              onSelectTab!(3);
+                            }
+                          },
+                          child: const CircleAvatar(
+                            radius: 26,
+                            backgroundColor: Color(0x33FFFFFF),
+                            child: Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
@@ -84,62 +91,66 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Notification Alert Banner
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                    InkWell(
+                      onTap: () => Navigator.of(context).pushNamed('/news'),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0x26FFFFFF),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0x33FFFFFF),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              const Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              Positioned(
-                                right: -2,
-                                top: -2,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFEF4444),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Text(
-                                    '2',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
+                        child: Row(
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Icon(
+                                  Icons.notifications_outlined,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                Positioned(
+                                  right: -2,
+                                  top: -2,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFEF4444),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Text(
+                                      '2',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'มีเรื่องแจ้งเตือน 2 รายการ',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              ],
                             ),
-                          ),
-                          const Spacer(),
-                          const Icon(
-                            Icons.chevron_right,
-                            color: Colors.white70,
-                            size: 20,
-                          ),
-                        ],
+                            const SizedBox(width: 12),
+                            const Text(
+                              'มีเรื่องแจ้งเตือน 2 รายการ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.chevron_right,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -206,9 +217,7 @@ class HomeScreen extends StatelessWidget {
                           icon: Icons.article_outlined,
                           title: 'ข่าวสาร',
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('ข่าวสารและประกาศ')),
-                            );
+                            Navigator.of(context).pushNamed('/news');
                           },
                         ),
                         _buildMenuItem(
@@ -226,9 +235,7 @@ class HomeScreen extends StatelessWidget {
                           icon: Icons.settings_outlined,
                           title: 'ตั้งค่า',
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('ตั้งค่าระบบ')),
-                            );
+                            Navigator.of(context).pushNamed('/settings');
                           },
                         ),
                       ],
@@ -249,7 +256,9 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/news');
+                          },
                           child: const Text(
                             'ดูทั้งหมด >',
                             style: TextStyle(
@@ -265,78 +274,84 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     // Announcement Card
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(12),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/news');
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x08000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
                             ),
-                            child: const Icon(
-                              Icons.electric_bolt,
-                              color: Color(0xFF025DD2),
-                              size: 28,
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.electric_bolt,
+                                color: Color(0xFF025DD2),
+                                size: 28,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 14),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'แจ้งปรับปรุงระบบไฟฟ้า',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1E293B),
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'อาคารเรียนรวม ชั้น 2',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF64748B),
-                                  ),
-                                ),
-                                SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today_outlined,
-                                      size: 14,
-                                      color: Color(0xFF025DD2),
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'แจ้งปรับปรุงระบบไฟฟ้า',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1E293B),
                                     ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      '1-5 มิ.ย. 2567',
-                                      style: TextStyle(
-                                        fontSize: 12,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'อาคารเรียนรวม ชั้น 2',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 14,
                                         color: Color(0xFF025DD2),
-                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '1-5 มิ.ย. 2567',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF025DD2),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
 
@@ -365,11 +380,11 @@ class HomeScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Color(0x05000000),
               blurRadius: 8,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),

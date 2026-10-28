@@ -9,7 +9,87 @@ class StatusTrackingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final passedItem = ModalRoute.of(context)?.settings.arguments as RepairItem?;
-    final item = passedItem ?? sampleRepairItems.first;
+    final item = passedItem ?? (RepairRepository.instance.items.isNotEmpty ? RepairRepository.instance.items.first : null);
+
+    if (item == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1E293B), size: 20),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          centerTitle: true,
+          title: const Text(
+            'ติดตามสถานะ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEFF6FF),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.build_outlined,
+                    size: 56,
+                    color: Color(0xFF0265D8),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'ยังไม่มีรายการแจ้งซ่อม',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'เมื่อคุณส่งข้อมูลแจ้งซ่อมแล้ว สามารถเข้ามาติดตามสถานะของรายการได้ที่นี่',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF64748B),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('ไปที่หน้าแจ้งซ่อม'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0265D8),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     final techName = item.technicianName ?? 'นายสมชาย ใจดี';
     final techRole = item.technicianRole ?? 'ช่างเทคนิค';
@@ -46,11 +126,11 @@ class StatusTrackingScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Color(0x05000000),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
@@ -273,17 +353,17 @@ class StatusTrackingScreen extends StatelessWidget {
                     : [
                         _buildTimelineItem(
                           title: 'รอช่างติดต่อกลับ',
-                          time: '6 ส.ค. 2567 10:35 น.',
+                          time: '-',
                           isCompleted: true,
-                          isCurrent: false,
+                          isCurrent: true,
                           isFirst: true,
                           isLast: false,
                         ),
                         _buildTimelineItem(
                           title: 'กำลังซ่อม',
-                          time: '6 ส.ค. 2567 13:20 น.',
-                          isCompleted: true,
-                          isCurrent: true,
+                          time: '-',
+                          isCompleted: false,
+                          isCurrent: false,
                           isFirst: false,
                           isLast: false,
                         ),

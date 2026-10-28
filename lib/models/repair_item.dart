@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 enum RepairStatus {
   pending('รอดำเนินการ', Color(0xFFEAB308), Color(0xFFFEF9C3)),
@@ -62,85 +63,92 @@ class RepairItem {
 class RepairRepository extends ChangeNotifier {
   static final RepairRepository instance = RepairRepository._internal();
   factory RepairRepository() => instance;
-  RepairRepository._internal();
+  RepairRepository._internal() {
+    fetchFromDatabase();
+  }
 
-  final List<RepairItem> _items = List.from(sampleRepairItems);
+  final List<RepairItem> _items = [];
 
   List<RepairItem> get items => List.unmodifiable(_items);
+
+  Future<void> fetchFromDatabase() async {
+    final dbRepairs = await ApiService.instance.fetchRepairs();
+    if (dbRepairs.isNotEmpty) {
+      _items.clear();
+      _items.addAll(dbRepairs);
+      notifyListeners();
+    }
+  }
 
   void addRepairItem(RepairItem item) {
     _items.insert(0, item);
     notifyListeners();
+
+    // Async sync to MySQL database
+    ApiService.instance.addRepair(item);
+  }
+
+  void updateRepairStatus(String ticketId, RepairStatus newStatus, {String? technicianName}) {
+    final index = _items.indexWhere((item) => item.id == ticketId);
+    if (index != -1) {
+      final existing = _items[index];
+      final updatedTimeline = List<StatusTimelineStep>.from(existing.timeline ?? []);
+      final now = DateTime.now();
+      final timeStr = formatThaiDateTime(now);
+
+      if (newStatus == RepairStatus.inProgress) {
+        updatedTimeline.add(
+          StatusTimelineStep(
+            title: 'ช่างรับเรื่อง/กำลังซ่อม',
+            dateTime: timeStr,
+            isCompleted: true,
+            isCurrent: true,
+          ),
+        );
+      } else if (newStatus == RepairStatus.completed) {
+        updatedTimeline.add(
+          StatusTimelineStep(
+            title: 'ซ่อมเสร็จเรียบร้อย',
+            dateTime: timeStr,
+            isCompleted: true,
+            isCurrent: true,
+          ),
+        );
+      }
+
+      final techName = technicianName ?? existing.technicianName ?? 'ช่างเทคนิค';
+
+      _items[index] = RepairItem(
+        id: existing.id,
+        title: existing.title,
+        category: existing.category,
+        location: existing.location,
+        details: existing.details,
+        status: newStatus,
+        date: existing.date,
+        urgency: existing.urgency,
+        reporterName: existing.reporterName,
+        technicianName: techName,
+        technicianRole: existing.technicianRole,
+        timeline: updatedTimeline,
+        imagePaths: existing.imagePaths,
+      );
+      notifyListeners();
+
+      // Async sync status update to MySQL database
+      String statusStr = 'pending';
+      if (newStatus == RepairStatus.inProgress) {
+        statusStr = 'inProgress';
+      } else if (newStatus == RepairStatus.completed) {
+        statusStr = 'completed';
+      } else if (newStatus == RepairStatus.cancelled) {
+        statusStr = 'cancelled';
+      }
+
+      ApiService.instance.updateRepairStatus(ticketId, statusStr, techName);
+    }
   }
 }
-
-// Initial sample data matching screens
-final List<RepairItem> sampleRepairItems = [
-  RepairItem(
-    id: '#20240806001',
-    title: 'เครื่องปรับอากาศ',
-    category: 'เครื่องปรับอากาศ',
-    location: 'อาคารเรียนรวม ห้อง 305',
-    details: 'แอร์ไม่เย็น เปิดแล้วไม่ค่อยมีลม',
-    status: RepairStatus.inProgress,
-    date: '6 ส.ค. 2567',
-    urgency: 'ปกติ',
-    reporterName: 'นางสาวกุลภัสส์ เปี้ยวน้อย',
-    technicianName: 'นายสมชาย ใจดี',
-    technicianRole: 'ช่างเทคนิค',
-    timeline: [
-      StatusTimelineStep(
-        title: 'รอช่างติดต่อกลับ',
-        dateTime: '6 ส.ค. 2567 10:35 น.',
-        isCompleted: true,
-      ),
-      StatusTimelineStep(
-        title: 'กำลังซ่อม',
-        dateTime: '6 ส.ค. 2567 13:20 น.',
-        isCompleted: true,
-        isCurrent: true,
-      ),
-      StatusTimelineStep(
-        title: 'ซ่อมเสร็จ',
-        dateTime: null,
-        isCompleted: false,
-      ),
-    ],
-  ),
-  RepairItem(
-    id: '#20240728003',
-    title: 'ไฟฟ้า',
-    category: 'ไฟฟ้า',
-    location: 'อาคารเรียนรวม ชั้น 2',
-    details: 'ปลั๊กไฟชำรุด ใช้งานไม่ได้',
-    status: RepairStatus.completed,
-    date: '28 ก.ค. 2567',
-    urgency: 'ปกติ',
-    reporterName: 'นางสาวกุลภัสส์ เปี้ยวน้อย',
-  ),
-  RepairItem(
-    id: '#20240715002',
-    title: 'ประปา',
-    category: 'ประปา',
-    location: 'อาคารเรียนรวม ชั้น 1',
-    details: 'ก๊อกน้ำรั่วในห้องน้ำชาย',
-    status: RepairStatus.completed,
-    date: '15 ก.ค. 2567',
-    urgency: 'ด่วน',
-    reporterName: 'นางสาวกุลภัสส์ เปี้ยวน้อย',
-  ),
-  RepairItem(
-    id: '#20240701004',
-    title: 'โต๊ะ/เก้าอี้',
-    category: 'โต๊ะ/เก้าอี้',
-    location: 'อาคารเรียนรวม ห้อง 101',
-    details: 'เก้าอี้ขาชำรุด 2 ตัว',
-    status: RepairStatus.cancelled,
-    date: '1 ก.ค. 2567',
-    urgency: 'ปกติ',
-    reporterName: 'นางสาวกุลภัสส์ เปี้ยวน้อย',
-  ),
-];
 
 String formatThaiDate(DateTime dt) {
   const months = [

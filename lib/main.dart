@@ -5,6 +5,9 @@ import 'screens/main_screen.dart';
 import 'screens/status_tracking_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/history_screen.dart';
+import 'screens/news_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/technician/technician_main_screen.dart';
 
 void main() {
   runApp(const FixUApp());
@@ -37,9 +40,12 @@ class FixUApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/main': (context) => const MainScreen(),
+        '/technician_main': (context) => const TechnicianMainScreen(),
         '/status': (context) => const StatusTrackingScreen(),
         '/report': (context) => const ReportScreen(),
         '/history': (context) => const HistoryScreen(),
+        '/news': (context) => const NewsScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }
